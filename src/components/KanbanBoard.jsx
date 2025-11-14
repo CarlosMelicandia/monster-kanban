@@ -39,7 +39,7 @@ return (
         tasks={boards.doing}
         onMove={moveTask}
         name="doing"
-        monster={{ color: "bg-orange-500", height: "h-20" }}
+        monster={{ color: "bg-orange-500", height: "h-16" }}
     />
     <Column
         title="Review"
@@ -47,7 +47,7 @@ return (
         tasks={boards.review}
         onMove={moveTask}
         name="review"
-        monster={{ color: "bg-green-600", height: "h-24" }}
+        monster={{ color: "bg-green-600", height: "h-16" }}
     />
     <Column
         title="Done"
@@ -55,7 +55,7 @@ return (
         tasks={boards.done}
         onMove={moveTask}
         name="done"
-        monster={{ color: "bg-blue-500", height: "h-28" }}
+        monster={{ color: "bg-blue-500", height: "h-16" }}
     />
     </div>
 );
