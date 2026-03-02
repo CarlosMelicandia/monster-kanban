@@ -1,11 +1,42 @@
 import { useEffect, useRef } from "react";
 
-export default function Monster({ color, height = "h-24" }) {
+const Teeth = ({ direction, count }) => {
+  const vbWidth = count * 20;
+  const h = 42;
+  const toothH = 30;
+
+  const d = Array.from({ length: count }, (_, i) => {
+    const x = i * 20;
+    return direction === "down"
+      ? `M${x},0 L${x},${h - toothH} Q${x + 10},${h} ${x + 20},${h - toothH} L${x + 20},0 Z`
+      : `M${x},${h} L${x},${toothH} Q${x + 10},0 ${x + 20},${toothH} L${x + 20},${h} Z`;
+  }).join(" ");
+
+  return (
+    <svg
+      width="100%"
+      height={h}
+      viewBox={`0 0 ${vbWidth} ${h}`}
+      preserveAspectRatio="none"
+      className="block"
+    >
+      <path d={d} fill="white" />
+    </svg>
+  );
+};
+
+export default function Monster({
+  color,
+  bodyColor,
+  upperTeeth = 5,
+  lowerTeeth = 4,
+  eyes = { left: "5rem", right: "5rem" },
+  children,
+}) {
   const eyesRef = useRef([]);
   const pupilsRef = useRef([]);
-  const maxMove = 5; // smaller = subtler movement
+  const maxMove = 5;
 
-  // Track mouse and move pupils
   useEffect(() => {
     const handleMove = (e) => {
       eyesRef.current.forEach((eye, index) => {
@@ -29,7 +60,6 @@ export default function Monster({ color, height = "h-24" }) {
     return () => window.removeEventListener("mousemove", handleMove);
   }, []);
 
-  // utility functions to register eyes/pupils
   const setEyeRef = (el) => {
     if (el && !eyesRef.current.includes(el)) eyesRef.current.push(el);
   };
@@ -39,29 +69,40 @@ export default function Monster({ color, height = "h-24" }) {
   };
 
   return (
-    <div
-      className={`${color} ${height} relative rounded-t-full rounded-b-md flex justify-center items-start pt-2 mb-4`}
-      style={{ width: "5rem" }}
-    >
-      {/* Eyes */}
-      <div className="flex space-x-1 mt-2">
-        <div
-          className="relative w-5 h-5 bg-white rounded-full overflow-hidden"
-          ref={setEyeRef}
-        >
+    <div className={`${color} w-full rounded-3xl overflow-hidden shadow-xl flex flex-col`}>
+      {/* Monster Head — eyes */}
+      <div className="w-full flex justify-center items-end py-6 gap-5">
+        {[eyes.left, eyes.right].map((size, i) => (
           <div
-            ref={setPupilRef}
-            className="absolute w-2 h-2 bg-black rounded-full top-1.5 left-1.5 transition-transform duration-75 ease-linear"
-          />
-        </div>
-        <div
-          className="relative w-5 h-5 bg-white rounded-full overflow-hidden"
-          ref={setEyeRef}
-        >
-          <div
-            ref={setPupilRef}
-            className="absolute w-2 h-2 bg-black rounded-full top-1.5 left-1.5 transition-transform duration-75 ease-linear"
-          />
+            key={i}
+            className="relative bg-white rounded-full overflow-hidden flex-shrink-0"
+            style={{ width: size, height: size }}
+            ref={setEyeRef}
+          >
+            <div
+              ref={setPupilRef}
+              className="absolute bg-black rounded-full transition-transform duration-75 ease-linear"
+              style={{
+                width: "40%",
+                height: "40%",
+                top: "30%",
+                left: "30%",
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Mouth */}
+      <div className="w-full px-2 pb-3">
+        <div className="bg-black/30 rounded-2xl overflow-hidden">
+          <Teeth direction="down" count={upperTeeth} />
+
+          <div className={`${bodyColor} mx-2 rounded-xl`}>
+            <div className="p-3">{children}</div>
+          </div>
+
+          <Teeth direction="up" count={lowerTeeth} />
         </div>
       </div>
     </div>

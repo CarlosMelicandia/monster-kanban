@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Column from "./Column";
-import { getTasks, addTask as addTaskAPI } from "../api/tasks";
+import { getTasks, addTask as addTaskAPI, updateTask, deleteTask } from "../api/tasks";
 
 export default function KanbanBoard() {
   const [boards, setBoards] = useState({
@@ -57,7 +57,7 @@ export default function KanbanBoard() {
     if (from === to) return;
     const newStatus = to === "backlog" ? "todo" : to;
     try {
-      // TODO: change tasks from old status to new status
+      await updateTask(task.id, { title: task.text, status: newStatus });
       setBoards((prev) => {
         const newBoards = { ...prev };
         newBoards[from] = newBoards[from].filter((t) => t.id !== task.id);
@@ -69,10 +69,27 @@ export default function KanbanBoard() {
     }
   };
 
+  // Edit task title
+  const editTask = async (column, id, newText) => {
+    const status = column === "backlog" ? "todo" : column;
+    try {
+      await updateTask(id, { title: newText, status });
+      setBoards((prev) => {
+        const newBoards = { ...prev };
+        newBoards[column] = newBoards[column].map((t) =>
+          t.id === id ? { ...t, text: newText } : t
+        );
+        return newBoards;
+      });
+    } catch (err) {
+      console.error("Error editing task:", err);
+    }
+  };
+
   // Remove task (delete)
   const removeTask = async (column, id) => {
     try {
-      // TODO: remove task
+      await deleteTask(id);
       setBoards((prev) => {
         const newBoards = { ...prev };
         newBoards[column] = newBoards[column].filter((t) => t.id !== id);
@@ -92,8 +109,9 @@ export default function KanbanBoard() {
         onMove={moveTask}
         onAdd={addTask}
         onRemove={removeTask}
+        onEdit={editTask}
         name="backlog"
-        monster={{ color: "bg-red-500", height: "h-16" }}
+        monster={{ color: "bg-red-500", upper: 4, lower: 3, eyes: { left: "4rem", right: "6rem" } }}
       />
       <Column
         title="Doing"
@@ -102,8 +120,9 @@ export default function KanbanBoard() {
         onMove={moveTask}
         onAdd={addTask}
         onRemove={removeTask}
+        onEdit={editTask}
         name="doing"
-        monster={{ color: "bg-orange-500", height: "h-16" }}
+        monster={{ color: "bg-orange-500", upper: 6, lower: 5, eyes: { left: "5.5rem", right: "3.5rem" } }}
       />
       <Column
         title="Review"
@@ -112,8 +131,9 @@ export default function KanbanBoard() {
         onMove={moveTask}
         onAdd={addTask}
         onRemove={removeTask}
+        onEdit={editTask}
         name="review"
-        monster={{ color: "bg-green-500", height: "h-16" }}
+        monster={{ color: "bg-green-500", upper: 3, lower: 6, eyes: { left: "6rem", right: "4.5rem" } }}
       />
       <Column
         title="Done"
@@ -122,8 +142,9 @@ export default function KanbanBoard() {
         onMove={moveTask}
         onAdd={addTask}
         onRemove={removeTask}
+        onEdit={editTask}
         name="done"
-        monster={{ color: "bg-blue-500", height: "h-16" }}
+        monster={{ color: "bg-blue-500", upper: 5, lower: 4, eyes: { left: "3.5rem", right: "5rem" } }}
       />
     </div>
   );

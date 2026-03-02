@@ -6,11 +6,11 @@ export async function getTasks() {
   return res.json();
 }
 
-export async function addTask(title) {
+export async function addTask(title, status = "todo") {
   const res = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, status: "todo" }),
+    body: JSON.stringify({ title, status }),
   });
   if (!res.ok) throw new Error("Failed to create task");
   return res.json();

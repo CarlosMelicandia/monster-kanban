@@ -9,6 +9,7 @@ export default function Column({
   onMove,
   onAdd,
   onRemove,
+  onEdit,
   name,
   monster,
 }) {
@@ -28,15 +29,10 @@ export default function Column({
 
   return (
     <div
-      className="flex flex-col items-center"
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
-      {/* Monster */}
-      <Monster color={monster.color} height={monster.height} />
-
-      {/* Board Column */}
-      <div className={`${color} p-3 rounded-lg shadow w-full -mt-4`}>
+      <Monster color={monster.color} bodyColor={color} upperTeeth={monster.upper} lowerTeeth={monster.lower} eyes={monster.eyes}>
         <h2 className="text-lg font-semibold text-gray-800 mb-2 text-center">
           {title}
         </h2>
@@ -49,7 +45,7 @@ export default function Column({
             </p>
           ) : (
             tasks.map((t) => (
-              <Task key={t.id} task={t} from={name} onRemove={onRemove} />
+              <Task key={t.id} task={t} from={name} onRemove={onRemove} onEdit={onEdit} />
             ))
           )}
         </div>
@@ -69,7 +65,7 @@ export default function Column({
             ➕
           </button>
         </div>
-      </div>
+      </Monster>
     </div>
   );
 }
